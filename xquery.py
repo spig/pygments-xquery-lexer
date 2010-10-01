@@ -74,7 +74,7 @@ class XQueryLexer(RegexLexer):
 				'operator': [
 						include('whitespace'),
 						include('pop-states'),
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 
 						(r'\{', Operator, ('operator', '#push')),
 						(r'then|else|external|and|at|div|except', Operator, 'root'),
@@ -101,7 +101,7 @@ class XQueryLexer(RegexLexer):
 						],
 				'namespacedecl': [
 						include('whitespace'),
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(r'(at)(\s+)'+stringdouble, bygroups(Keyword, Text, String.Double)),
 						(r"(at)(\s+)"+stringsingle, bygroups(Keyword, Text, String.Single)),
 						(stringdouble, String.Double),
@@ -113,7 +113,7 @@ class XQueryLexer(RegexLexer):
 						],
 				'namespacekeyword': [
 						include('whitespace'),
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(stringdouble, String.Double, 'namespacedecl'),
 						(stringsingle, String.Single, 'namespacedecl'),
 						(r'inherit|no-inherit', Keyword, 'root'),
@@ -123,16 +123,16 @@ class XQueryLexer(RegexLexer):
 						(r',', Punctuation)
 						],
 				'varname': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(qname, Name.Variable, ('#pop', 'operator')),
 						],
 				'singletype': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(ncname + r'(:\*)', Name.Class, 'operator'),
 						(qname, Name.Class, 'operator'),
 						],
 				'itemtype': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(r'\$', Punctuation, 'varname'),
 						(r'void\s*\(\s*\)', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'operator'),
 						(ncname + r'(:\*)', Name.Class, 'operator'),
@@ -160,7 +160,7 @@ class XQueryLexer(RegexLexer):
 						(r'(\))(\s*)(as)', bygroups(Operator, Text, Keyword), 'itemtype')
 						],
 				'kindtest': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(r'{', Punctuation, ('operator', 'root')),
 						(r'\)', Punctuation, '#pop'),
 						(r'\*', Name, 'closekindtest'),
@@ -169,14 +169,14 @@ class XQueryLexer(RegexLexer):
 						(r'(element|schema-element)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('kindtest'))
 						],
 				'kindtestforpi': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(r'\)', Punctuation, '#pop'),
 						(ncname, bygroups(Name.Variable, Name.Variable)),
 						(stringdouble, String.Double),
 						(stringsingle, String.Single)
 						],
 				'closekindtest': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						include('pop-states'),
 						(r',', Punctuation),
 						(r'\{', Punctuation, ('operator', 'root')),
@@ -245,17 +245,17 @@ class XQueryLexer(RegexLexer):
 						(qname, Name.Tag)
 						],
 				'xmlspace_decl': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(r'preserve|strip', Keyword, '#pop')
 						],
 				'declareordering': [
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						include('whitespace'),
 						(r'ordered|unordered', Keyword, '#pop')
 						],
 				'xqueryversion': [
 						include('whitespace'),
-						(r'\(:', Comment, 'comment'),
+						(r'\(:', Comment, ('#pop', 'comment')),
 						(stringdouble, String.Double),
 						(stringsingle, String.Single),
 						(r'encoding', Keyword),
@@ -278,6 +278,9 @@ class XQueryLexer(RegexLexer):
 				'pop-states': [
 						(r'\}', Punctuation, '#pop'),
 						(r'\)', Punctuation, '#pop')
+						],
+				'qname_braren': [
+						(r'(\s*)(\(|\{)', bygroups(Text, Punctuation), ('#pop', 'operator')),
 						],
         'root': [
 						include('pop-states'),
@@ -308,7 +311,7 @@ class XQueryLexer(RegexLexer):
 						#VARNAMEs
 						(r'(for|let|some|every)(\s+)(\$)', bygroups(Keyword, Text, Name.Variable), 'varname'),
 						(r'\$', Name.Variable, 'varname'),
-						(r'(declare)(\s+)(variable)(\s+)(\$)', bygroups(Keyword, Text, Keyword, Text, Punctuation), 'varname'),
+						(r'(declare)(\s+)(variable)(\s+)(\$)', bygroups(Keyword, Text, Keyword, Text, Name.Variable), 'varname'),
 
 						#ITEMTYPE
 						(r'(\))(\s+)(as)', bygroups(Operator, Text, Keyword), 'itemtype'),
@@ -363,7 +366,7 @@ class XQueryLexer(RegexLexer):
 						(r'(at)(\s+)('+stringsingle+')', String.Single, 'namespacedecl'),
 
 						# STANDALONE QNAMES
-						(qname + r'(\s*)(\(|\{)', bygroups(Name.Variable, Text, Punctuation)),
+						(qname + r'(?=((\s*)(\(|\{)))', Name.Variable, 'qname_braren'),
 
 						(r'(ancestor-or-self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
 						(r'(ancestor)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
