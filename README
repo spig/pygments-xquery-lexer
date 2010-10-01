@@ -1,0 +1,10 @@
+The xquery pygments lexer can be added to the pygments project by adding the xquery.py file to the pygments/lexers folder and by adding the following line to pygments/lexers/_mapping.py in the Lexers section.
+
+'XQueryLexer': ('pygments.lexers.xquery', 'XQuery', ('xquery', 'xqy'), ('*.xqy', '*.xquery'), ('text/xquery', 'application/xquery')),
+
+Be certain to include the trailing ',' if this is not the last line in the file.
+
+
+Once this is installed properly, the pygmentize command should return 'XQuery' when given input of an xquery file with either extension of 'xquery' or 'xqy'.
+
+This is a first draft and there are bugs. Probably a lot of them. This tries to use regular expressions and state transitions to be a parser of the xquery langauge.
