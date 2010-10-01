@@ -280,7 +280,7 @@ class XQueryLexer(RegexLexer):
 						(r'\)', Punctuation, '#pop')
 						],
 				'qname_braren': [
-						(r'(\s*)(\(|\{)', bygroups(Text, Punctuation), ('#pop', 'operator')),
+						(r'(\s*)(\(|\{)', bygroups(Text, Punctuation), ('#pop', 'operator', 'root')),
 						],
         'root': [
 						include('pop-states'),
@@ -342,7 +342,7 @@ class XQueryLexer(RegexLexer):
 						#ATTRIBUTE
 						(r'(attribute)(\s+)' + qname + r'(\s*)(\{)', bygroups(Keyword, Text, Name.Variable, Text, Punctuation), 'operator'),
 						#ELEMENT
-						(r'(element)(\s+)', bygroups(Keyword, Text)),
+						(r'(element)(\s+)(?=' +qname+ r')', bygroups(Keyword, Text)),
 						#PROCESSING_INSTRUCTION
 						(r'(processing-instruction)(\s+)' + ncname + r'(\s*)(\{)', bygroups(Keyword, Text, Name.Variable, Text, Punctuation), 'operator'),
 
@@ -365,30 +365,15 @@ class XQueryLexer(RegexLexer):
 						(r'(at)(\s+)('+stringdouble+')', String.Double, 'namespacedecl'),
 						(r'(at)(\s+)('+stringsingle+')', String.Single, 'namespacedecl'),
 
+
+						(r'(ancestor-or-self|ancestor|attribute|child|descendant-or-self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
+						(r'(descendant|following-sibling|following|parent|preceding-sibling|preceding|self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
+
+						(r'(if)(\s*)(\()', bygroups(Keyword, Text, Punctuation)),
+						(r'//|/|\+|-|\@|;|,|\(', Punctuation),
+
 						# STANDALONE QNAMES
 						(qname + r'(?=((\s*)(\(|\{)))', Name.Variable, 'qname_braren'),
-
-						(r'(ancestor-or-self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(ancestor)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(attribute)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(child)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(descendant-or-self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(descendant)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(following-sibling)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(following)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(parent)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(preceding-sibling)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(preceding)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(self)(\s*)(::)', bygroups(Keyword, Text, Punctuation)),
-						(r'(if)(\s*)(\()', bygroups(Keyword, Text, Punctuation)),
-						(r'//', Punctuation),
-						(r'/', Punctuation),
-						(r'\+', Punctuation),
-						(r'-', Punctuation),
-						(r'\@', Punctuation),
-						(r';', Punctuation),
-						(r',', Punctuation),
-						(r'\(', Punctuation),
 						(qname, Name, 'operator'),
         ]
     }
