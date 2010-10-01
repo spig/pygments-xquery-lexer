@@ -292,8 +292,7 @@ class XQueryLexer(RegexLexer):
 						(r'(\d+)(\.\d*)?(\s*)([eE])(\s*)([\+\-]?)(\s*)(\d+)', bygroups(Operator, Operator, Text, Operator, Text, Operator, Text, Operator), 'operator'),
 						(r'(\.\d+)(\s*)([eE])(\s*)([\+\-]?)(\s*)(\d+)', bygroups(Operator, Text, Operator, Text, Operator, Text, Operator), 'operator'),
 						(r'(\d+)', Operator, 'operator'),
-						(qname + ':\*', Name, 'operator'),
-						(qname, Name, 'operator'),
+						(ncname + ':\*', Name, 'operator'),
 						(stringdouble, String.Double, 'operator'),
 						(stringsingle, String.Single, 'operator'),
 
@@ -386,6 +385,7 @@ class XQueryLexer(RegexLexer):
 						(r'\@', Punctuation),
 						(r';', Punctuation),
 						(r',', Punctuation),
-						(r'\(', Punctuation)
+						(r'\(', Punctuation),
+						(qname, Name, 'operator'),
         ]
     }
