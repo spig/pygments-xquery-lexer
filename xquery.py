@@ -282,6 +282,9 @@ class XQueryLexer(RegexLexer):
 				'qname_braren': [
 						(r'(\s*)(\(|\{)', bygroups(Text, Punctuation), ('#pop', 'operator', 'root')),
 						],
+				'element_qname': [
+						(qname, Name.Variable, ('#pop', 'root')),
+						],
         'root': [
 						include('pop-states'),
 						include('whitespace'),
@@ -342,7 +345,7 @@ class XQueryLexer(RegexLexer):
 						#ATTRIBUTE
 						(r'(attribute)(\s+)' + qname + r'(\s*)(\{)', bygroups(Keyword, Text, Name.Variable, Text, Punctuation), 'operator'),
 						#ELEMENT
-						(r'(element)(\s+)(?=' +qname+ r')', bygroups(Keyword, Text)),
+						(r'(element)(\s+)(?=' +qname+ r')', bygroups(Keyword, Text), 'element_qname'),
 						#PROCESSING_INSTRUCTION
 						(r'(processing-instruction)(\s+)' + ncname + r'(\s*)(\{)', bygroups(Keyword, Text, Name.Variable, Text, Punctuation), 'operator'),
 
@@ -373,7 +376,7 @@ class XQueryLexer(RegexLexer):
 						(r'//|/|\+|-|\@|;|,|\(', Punctuation),
 
 						# STANDALONE QNAMES
-						(qname + r'(?=((\s*)(\(|\{)))', Name.Variable, 'qname_braren'),
+						(qname + r'?=((\s*)(\(|\{))', Name.Variable, 'qname_braren'),
 						(qname, Name, 'operator'),
         ]
     }
