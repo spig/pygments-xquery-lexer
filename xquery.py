@@ -78,7 +78,7 @@ class XQueryLexer(RegexLexer):
 
 						(r'\{', Punctuation, ('operator', '#pop', 'root')),
 						(r'then|else|external|and|at|div|except', Keyword, 'root'),
-						(r'eq|ge|gt|le|lt|ne|idiv|intersect|in', Operator, 'root'),
+						(r'(eq|ge|gt|le|lt|ne|idiv|intersect|in)(?=\b)', Operator, 'root'),
 						(r'is|mod|order\s+by|stable\s+order\s+by|or', Operator, 'root'),
 						(r'return|satisfies|to|union|where|preserve\s+strip', Operator, ('#pop', 'root')),
             (r';|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+//|/|\||:=|\,|=', Operator, ('#pop', 'root')),
@@ -146,6 +146,8 @@ class XQueryLexer(RegexLexer):
 						(r'(comment)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtest')),
 						(r'(text)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtest')),
 						(r'(node)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtest')),
+						# Marklogic specific type?
+						(r'(binary)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtest')),
 						(r'(document-node)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtest')),
 						(r'(processing-instruction)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtestforpi')),
 						(r'(item)(\s*)(\()(\s*)(\))', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'occurrenceindicator'),
