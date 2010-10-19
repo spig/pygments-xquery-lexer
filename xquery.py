@@ -205,14 +205,14 @@ class XQueryLexer(RegexLexer):
 				'start_tag': [
 						include('whitespace'),
 						(r'/>', Name.Tag, '#pop'),
-						(r'>', Name.Tag, 'element_content'),
+						(r'>', Name.Tag, ('#pop', '#pop', 'element_content')),
 						(r'"', Punctuation, 'quot_attribute_content'),
 						(r"'", Punctuation, 'apos_attribute_content'),
 						(r'=', Operator),
 						(qname, Name.Tag),
 						],
 				'quot_attribute_content': [
-						(r'"', Punctuation, 'start_tag'),
+						(r'"', Punctuation, ('#pop', 'start_tag')),
 						(r'\{', Punctuation, ('#pop', 'root')),
 						(r'""', Name.Attribute),
 						(quotattrcontentchar, Name.Attribute),
@@ -221,7 +221,7 @@ class XQueryLexer(RegexLexer):
 						(r'\{\{|\}\}', Name.Attribute)
 						],
 				'apos_attribute_content': [
-						(r"'", Punctuation, 'start_tag'),
+						(r"'", Punctuation, ('#pop', 'start_tag')),
 						(r'\{', Punctuation, ('#pop', 'root')),
 						(r"''", Name.Attribute),
 						(aposattrcontentchar, Name.Attribute),
@@ -231,19 +231,19 @@ class XQueryLexer(RegexLexer):
 						],
 				'element_content': [
 						(r'</', Name.Tag, ('#pop', 'end_tag')),
-						(r'\{', Punctuation, ('#pop', 'root')),
+						(r'\{', Punctuation, 'root'),
 						(r'<!--', Punctuation, 'xml_comment'),
 						(r'<\?', Punctuation, 'processing_instruction'),
 						(r'<!\[CDATA\[', Punctuation, 'cdata_section'),
-						(r'<', Name.Tag, 'start_tag'),
+						(r'<', Name.Tag, ('#pop', 'start_tag')),
 						(elementcontentchar, Literal),
 						(entityref, Literal),
 						(charref, Literal),
 						(r'\{\{|\}\}', Literal),
 						],
 				'end_tag': [
+						include('whitespace'),
 						(r'>', Name.Tag, '#pop'),
-						(r'\s', Text),
 						(qname, Name.Tag)
 						],
 				'xmlspace_decl': [
@@ -336,6 +336,7 @@ class XQueryLexer(RegexLexer):
 
 						(r'<!\[CDATA\[', Operator, ('operator', 'cdata_section')),
 
+						(r'</', Name.Tag, ('#pop', 'end_tag')),
 						(r'<', Name.Tag, ('operator', 'start_tag')),
 
 						(r'(declare)(\s+)(boundary-space)', bygroups(Keyword, Text, Keyword), 'xmlspace_decl'),
