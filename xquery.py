@@ -403,6 +403,8 @@ class XQueryLexer(RegexLexer):
 
 						(r'//|/|\+|-|\@|;|,|\(', Punctuation),
 
+						(r'=', Operator),
+
 						# STANDALONE QNAMES
 						(qname + r'(?=\s*[({])', Name.Variable),#, 'qname_braren'),
 						(qname, Name.Variable),#, 'operator'),
