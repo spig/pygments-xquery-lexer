@@ -117,12 +117,12 @@ class XQueryLexer(ExtendedRegexLexer):
 
 		def pushstate_operator_starttag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
-			print lexer.xquery_parse_state
+			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			print lexer.xquery_parse_state
-			print ctx.stack
+			#print lexer.xquery_parse_state
+			#print ctx.stack
 			ctx.stack.append('start_tag')
-			print ctx.stack
+			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_operator_root_callback(lexer, match, ctx):
