@@ -91,6 +91,17 @@ class XQueryLexer(ExtendedRegexLexer):
 			ctx.stack.append('start_tag')
 			ctx.pos = match.end()
 
+		def pushstate_operator_kindtest_callback(lexer, match, ctx):
+			yield match.start(), Keyword, match.group(1)
+			yield match.start(), Text, match.group(2)
+			yield match.start(), Punctuation, match.group(3)
+			#print lexer.xquery_parse_state
+			lexer.xquery_parse_state.append('operator')
+			#print lexer.xquery_parse_state
+			#print ctx.stack
+			ctx.stack.append('kindtest')
+			#print ctx.stack
+			ctx.pos = match.end()
 
 		def pushstate_occurrenceindicator_kindtest_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
@@ -405,7 +416,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						#ITEMTYPE
 						(r'(\))(\s+)(as)', bygroups(Operator, Text, Keyword), 'itemtype'),
 
-						(r'(element|attribute|schema-element|schema-attribute|comment|text|node|document-node)(\s+)(\()', bygroups(Keyword, Text, Operator), ('operator', 'kindtest')),
+						(r'(element|attribute|schema-element|schema-attribute|comment|text|node|document-node)(\s+)(\()', pushstate_operator_kindtest_callback),
 
 						(r'(processing-instruction)(\s+)(\()', bygroups(Keyword, Text, Operator), ('operator', 'kindtestforpi')),
 
