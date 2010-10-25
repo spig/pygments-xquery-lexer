@@ -161,7 +161,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'then|else|external|and|at|div|except', Keyword, 'root'),
 						(r'(eq|ge|gt|le|lt|ne|idiv|intersect|in)(?=\b)', Operator, 'root'),
 						(r'is|mod|order\s+by|stable\s+order\s+by|or', Operator, 'root'),
-						(r'return|satisfies|to|union|where|preserve\s+strip', Operator, ('#pop', 'root')),
+						(r'return|satisfies|to|union|where|preserve\s+strip', Operator, 'root'),
             (r'(;|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+|//|/|\||:=|\,|=)', operator_root_callback),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
 						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'itemtype'),
@@ -186,7 +186,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						],
 				'namespacedecl': [
 						include('whitespace'),
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(r'(at)(\s+)'+stringdouble, bygroups(Keyword, Text, String.Double)),
 						(r"(at)(\s+)"+stringsingle, bygroups(Keyword, Text, String.Single)),
 						(stringdouble, String.Double),
@@ -198,7 +198,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						],
 				'namespacekeyword': [
 						include('whitespace'),
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(stringdouble, String.Double, 'namespacedecl'),
 						(stringsingle, String.Single, 'namespacedecl'),
 						(r'inherit|no-inherit', Keyword, 'root'),
@@ -212,13 +212,13 @@ class XQueryLexer(ExtendedRegexLexer):
 						(qname, Name.Variable, 'operator'),
 						],
 				'singletype': [
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(ncname + r'(:\*)', Name.Variable, 'operator'),
 						(qname, Name.Variable, 'operator'),
 						],
 				'itemtype': [
 						include('whitespace'),
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(r'\$', Punctuation, 'varname'),
 						(r'void\s*\(\s*\)', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'operator'),
 						(r'(element|attribute|schema-element|schema-attribute|comment|text|node|binary|document-node)(\s*)(\()', pushstate_occurrenceindicator_kindtest_callback),
@@ -230,7 +230,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'then|else', Keyword, '#pop'),
 						(r'(at)(\s+)' + stringdouble, bygroups(Keyword, Text, String.Double), 'namespacedecl'),
 						(r'(at)(\s+)' + stringsingle, bygroups(Keyword, Text, String.Single), 'namespacedecl'),
-						(r'external|and|at|div|except|eq|ge|gt|le|lt|ne|:=|=|,|>=|>>|>|idiv|intersect|in|is|\[|\(|<=|<<|<|-|mod|!=|or|return|satisfies|to|union|\||where', Operator, ('#pop', 'root')),
+						(r'external|and|at|div|except|eq|ge|gt|le|lt|ne|:=|=|,|>=|>>|>|idiv|intersect|in|is|\[|\(|<=|<<|<|-|mod|!=|or|return|satisfies|to|union|\||where', Operator, 'root'),
 						(r'(stable)(\s+)(order)(\s+)(by)', bygroups(Keyword, Text, Keyword, Text, Keyword), 'root'),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
 						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'itemtype'),
@@ -240,21 +240,21 @@ class XQueryLexer(ExtendedRegexLexer):
 						(qname, Keyword.Type, 'operator'),
 						],
 				'kindtest': [
-						(r'\(:', Comment, ('#pop', 'comment')),
-						(r'({)', Punctuation, ('operator', '#pop', 'root')),
+						(r'\(:', Comment, 'comment'),
+						(r'({)', Punctuation, 'root'),
 						(r'\)', Punctuation, '#pop'),
-						(r'\*|' + qname, Name, ('#pop', 'closekindtest')),
-						(r'(element|schema-element)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('kindtest', '#pop', 'kindtest'))
+						(r'\*|' + qname, Name, 'closekindtest'),
+						(r'(element|schema-element)(\s*)(\()', bygroups(Keyword, Text, Punctuation), 'kindtest')
 						],
 				'kindtestforpi': [
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(r'\)', Punctuation, '#pop'),
 						(ncname, bygroups(Name.Variable, Name.Variable)),
 						(stringdouble, String.Double),
 						(stringsingle, String.Single)
 						],
 				'closekindtest': [
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(r'\)', Punctuation, '#pop'),
 						(r',', Punctuation),
 						(r'\{', Punctuation, ('operator', 'root')),
@@ -288,8 +288,8 @@ class XQueryLexer(ExtendedRegexLexer):
 						(qname, Name.Tag),
 						],
 				'quot_attribute_content': [
-						(r'"', Punctuation, ('#pop', 'start_tag')),
-						(r'\{', Punctuation, ('#pop', 'root')),
+						(r'"', Punctuation, 'start_tag'),
+						(r'\{', Punctuation, 'root'),
 						(r'""', Name.Attribute),
 						(quotattrcontentchar, Name.Attribute),
 						(entityref, Name.Attribute),
@@ -297,8 +297,8 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'\{\{|\}\}', Name.Attribute)
 						],
 				'apos_attribute_content': [
-						(r"'", Punctuation, ('#pop', 'start_tag')),
-						(r'\{', Punctuation, ('#pop', 'root')),
+						(r"'", Punctuation, 'start_tag'),
+						(r'\{', Punctuation, 'root'),
 						(r"''", Name.Attribute),
 						(aposattrcontentchar, Name.Attribute),
 						(entityref, Name.Attribute),
@@ -306,12 +306,12 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'\{\{|\}\}', Name.Attribute)
 						],
 				'element_content': [
-						(r'</', Name.Tag, ('#pop', 'end_tag')),
+						(r'</', Name.Tag, 'end_tag'),
 						(r'(\{)', pushstate_root_callback),
 						(r'<!--', Punctuation, 'xml_comment'),
 						(r'<\?', Punctuation, 'processing_instruction'),
 						(r'<!\[CDATA\[', Punctuation, 'cdata_section'),
-						(r'<', Name.Tag, ('#pop', 'start_tag')),
+						(r'<', Name.Tag, 'start_tag'),
 						(elementcontentchar, Literal),
 						(entityref, Literal),
 						(charref, Literal),
@@ -323,17 +323,17 @@ class XQueryLexer(ExtendedRegexLexer):
 						(qname, Name.Tag)
 						],
 				'xmlspace_decl': [
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(r'preserve|strip', Keyword, '#pop')
 						],
 				'declareordering': [
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						include('whitespace'),
 						(r'ordered|unordered', Keyword, '#pop')
 						],
 				'xqueryversion': [
 						include('whitespace'),
-						(r'\(:', Comment, ('#pop', 'comment')),
+						(r'\(:', Comment, 'comment'),
 						(stringdouble, String.Double),
 						(stringsingle, String.Single),
 						(r'encoding', Keyword),
@@ -350,7 +350,7 @@ class XQueryLexer(ExtendedRegexLexer):
 				'occurrenceindicator': [
 						include('whitespace'),
 						(r'\*|\?|\+', Operator, '#pop'),
-						(r':=', Keyword, ('#pop', 'root')),
+						(r':=', Keyword, 'root'),
 						],
 				'option': [
 						include('whitespace'),
@@ -415,7 +415,7 @@ class XQueryLexer(ExtendedRegexLexer):
 
 						(r'<!\[CDATA\[', Operator, ('operator', 'cdata_section')),
 
-						(r'</', Name.Tag, ('#pop', 'end_tag')),
+						(r'</', Name.Tag, 'end_tag'),
 						(r'(<)', pushstate_operator_starttag_callback),
 
 						(r'(declare)(\s+)(boundary-space)', bygroups(Keyword, Text, Keyword), 'xmlspace_decl'),
