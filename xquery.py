@@ -52,9 +52,13 @@ class XQueryLexer(ExtendedRegexLexer):
 		stringdouble = r'("((' + entityref + r')|(' + charref + r')|("")|([^&"]))*")'
 		stringsingle = r"('((" + entityref + r")|(" + charref + r")|('')|([^&']))*')"
 
-		elementcontentchar = ur'\t|\r|\n|[\u0020-\u0025]|[\u0028-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
-		quotattrcontentchar = ur'\t|\r|\n|[\u0020-\u0021]|[\u0023-\u0025]|[\u0027-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
-		aposattrcontentchar = ur'\t|\r|\n|[\u0020-\u0025]|[\u0028-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
+		# FIX UNICODE LATER
+		#elementcontentchar = ur'\t|\r|\n|[\u0020-\u0025]|[\u0028-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
+		elementcontentchar = r'[A-Za-z]|\s|\d|[!"#$%\(\)\*\+,\-\./\:;=\?\@\[\\\]^_\'`\|~]'
+		#quotattrcontentchar = ur'\t|\r|\n|[\u0020-\u0021]|[\u0023-\u0025]|[\u0027-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
+		quotattrcontentchar = r'[A-Za-z]|\s|\d|[!#$%\(\)\*\+,\-\./\:;=\?\@\[\\\]^_\'`\|~]'
+		#aposattrcontentchar = ur'\t|\r|\n|[\u0020-\u0025]|[\u0028-\u003b]|[\u003d-\u007a]|\u007c|[\u007e-\u007F]'
+		aposattrcontentchar = r'[A-Za-z]|\s|\d|[!"#$%\(\)\*\+,\-\./\:;=\?\@\[\\\]^_`\|~]'
 
 
 		# CHAR elements - fix the above elementcontentchar, quotattrcontentchar, aposattrcontentchar
@@ -355,7 +359,8 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'\(:', Comment, 'comment'),
 						(r'({)', Punctuation, 'root'),
 						(r'(\))([*+?]?)', popstate_kindtest_callback),
-						(r'\*|' + qname, Name, 'closekindtest'),
+						(r'\*', Name, 'closekindtest'),
+						(qname, Name, 'closekindtest'),
 						(r'(element|schema-element)(\s*)(\()', pushstate_kindtest_callback)
 						],
 				'kindtestforpi': [
@@ -367,9 +372,9 @@ class XQueryLexer(ExtendedRegexLexer):
 						],
 				'closekindtest': [
 						(r'\(:', Comment, 'comment'),
-						(r'\)', Punctuation, '#pop'),
+						(r'(\))', popstate_callback),
 						(r',', Punctuation),
-						(r'\{', Punctuation, ('operator', 'root')),
+						(r'(\{)', pushstate_operator_root_callback),
 						(r'\?', Punctuation)
 						],
 				'xml_comment': [
