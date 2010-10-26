@@ -80,15 +80,47 @@ class XQueryLexer(ExtendedRegexLexer):
 		def popstate_callback(lexer, match, ctx):
 			yield match.start(), Punctuation, match.group(1)
 			#print ctx.stack
+			#print lexer.xquery_parse_state
 			ctx.stack.append(lexer.xquery_parse_state.pop())
 			#print lexer.xquery_parse_state
 			#print ctx.stack
 			ctx.pos = match.end()
 
+		def pushstate_element_content_starttag_callback(lexer, match, ctx):
+			yield match.start(), Name.Tag, match.group(1)
+			#print lexer.xquery_parse_state
+			lexer.xquery_parse_state.append('element_content')
+			#print lexer.xquery_parse_state
+			#print ctx.stack
+			ctx.stack.append('start_tag')
+			#print ctx.stack
+			ctx.pos = match.end()
+
+		def pushstate_cdata_section_callback(lexer, match, ctx):
+			yield match.start(), String.Doc, match.group(1)
+			ctx.stack.append('cdata_section')
+			lexer.xquery_parse_state.append(ctx.state.pop)
+			ctx.pos = match.end()
+
 		def pushstate_starttag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
+			#print ctx.stack
 			lexer.xquery_parse_state.append(ctx.state.pop)
 			ctx.stack.append('start_tag')
+			#print lexer.xquery_parse_state
+			#print ctx.stack
+			ctx.pos = match.end()
+
+		def pushstate_kindtest_callback(lexer, match, ctx):
+			yield match.start(), Keyword, match.group(1)
+			yield match.start(), Text, match.group(2)
+			yield match.start(), Punctuation, match.group(3)
+			#print lexer.xquery_parse_state
+			lexer.xquery_parse_state.append('kindtest')
+			#print lexer.xquery_parse_state
+			#print ctx.stack
+			ctx.stack.append('kindtest')
+			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_operator_kindtest_callback(lexer, match, ctx):
@@ -108,6 +140,7 @@ class XQueryLexer(ExtendedRegexLexer):
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
 			#print lexer.xquery_parse_state
+			#print "added occurrenceindicator"
 			lexer.xquery_parse_state.append('occurrenceindicator')
 			#print lexer.xquery_parse_state
 			#print ctx.stack
@@ -235,27 +268,27 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'(element|attribute|schema-element|schema-attribute|comment|text|node|binary|document-node)(\s*)(\()', pushstate_occurrenceindicator_kindtest_callback),
 						# Marklogic specific type?
 						(r'(processing-instruction)(\s*)(\()', bygroups(Keyword, Text, Punctuation), ('occurrenceindicator', 'kindtestforpi')),
-						(r'(item)(\s*)(\()(\s*)(\))', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'occurrenceindicator'),
+						(r'(item)(\s*)(\()(\s*)(\))(?=[*+?])', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'occurrenceindicator'),
 						(r'\(\#', Punctuation, 'pragma'),
 						(r';', Punctuation, '#pop'),
 						(r'then|else', Keyword, '#pop'),
 						(r'(at)(\s+)' + stringdouble, bygroups(Keyword, Text, String.Double), 'namespacedecl'),
 						(r'(at)(\s+)' + stringsingle, bygroups(Keyword, Text, String.Single), 'namespacedecl'),
-						(r'external|and|at|div|except|eq|ge|gt|le|lt|ne|:=|=|,|>=|>>|>|idiv|intersect|in|is|\[|\(|<=|<<|<|-|mod|!=|or|return|satisfies|to|union|\||where', Operator, 'root'),
+						(r'external|and|at|div|except|eq|ge|gt|\ble\b|lt|ne|:=|=|,|>=|>>|>|idiv|intersect|in|is|\[|\(|<=|<<|<|-|mod|!=|or|return|satisfies|to|union|\||where', Operator, 'root'),
 						(r'(stable)(\s+)(order)(\s+)(by)', bygroups(Keyword, Text, Keyword, Text, Keyword), 'root'),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
-						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'itemtype'),
+						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword)),
 						(r'case|as', Keyword, 'itemtype'),
 						(r'(\))(\s*)(as)', bygroups(Operator, Text, Keyword), 'itemtype'),
 						(ncname + r'(:\*)', Keyword.Type, 'operator'),
-						(qname, Keyword.Type, 'operator'),
+						(qname, Keyword.Type, 'occurrenceindicator'),
 						],
 				'kindtest': [
 						(r'\(:', Comment, 'comment'),
 						(r'({)', Punctuation, 'root'),
-						(r'\)', Punctuation, '#pop'),
+						(r'(\))', popstate_callback),
 						(r'\*|' + qname, Name, 'closekindtest'),
-						(r'(element|schema-element)(\s*)(\()', bygroups(Keyword, Text, Punctuation), 'kindtest')
+						(r'(element|schema-element)(\s*)(\()', pushstate_kindtest_callback)
 						],
 				'kindtestforpi': [
 						(r'\(:', Comment, 'comment'),
@@ -321,8 +354,8 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'(\{)', pushstate_root_callback),
 						(r'<!--', Punctuation, 'xml_comment'),
 						(r'<\?', Punctuation, 'processing_instruction'),
-						(r'<!\[CDATA\[', Punctuation, 'cdata_section'),
-						(r'<', Name.Tag, 'start_tag'),
+						(r'(<!\[CDATA\[)', pushstate_cdata_section_callback),
+						(r'(<)', pushstate_element_content_starttag_callback),
 						(elementcontentchar, Literal),
 						(entityref, Literal),
 						(charref, Literal),
@@ -360,7 +393,8 @@ class XQueryLexer(ExtendedRegexLexer):
 						],
 				'occurrenceindicator': [
 						include('whitespace'),
-						(r'\*|\?|\+', Operator, '#pop'),
+						(r'\(:', Comment, 'comment'),
+						(r'\*|\?|\+', Operator, 'operator'),
 						(r':=', Keyword, 'root'),
 						],
 				'option': [
