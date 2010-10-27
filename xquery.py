@@ -234,7 +234,7 @@ class XQueryLexer(ExtendedRegexLexer):
 			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
 			#print lexer.xquery_parse_state
-			ctx.stack = ['root']
+			ctx.stack.append('root')
 			ctx.pos = match.end()
 
 		def pushstate_root_callback(lexer, match, ctx):
@@ -243,7 +243,7 @@ class XQueryLexer(ExtendedRegexLexer):
 			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append(cur_state)
 			#print lexer.xquery_parse_state
-			ctx.stack = ['root']
+			ctx.stack.append('root')
 			ctx.pos = match.end()
 
 		def pushstate_operator_callback(lexer, match, ctx):
@@ -406,7 +406,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						],
 				'quot_attribute_content': [
 						(r'"', Punctuation, 'start_tag'),
-						(r'\{', Punctuation, 'root'),
+						(r'(\{)', pushstate_root_callback),
 						(r'""', Name.Attribute),
 						(quotattrcontentchar, Name.Attribute),
 						(entityref, Name.Attribute),
