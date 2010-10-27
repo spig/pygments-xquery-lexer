@@ -445,8 +445,8 @@ class XQueryLexer(ExtendedRegexLexer):
 				'element_content': [
 						(r'</', Name.Tag, 'end_tag'),
 						(r'(\{)', pushstate_root_callback),
-						(r'<!--', pushstate_operator_xmlcomment_callback),
-						(r'<\?', pushstate_operator_processing_instruction_callback),
+						(r'(<!--)', pushstate_operator_xmlcomment_callback),
+						(r'(<\?)', pushstate_operator_processing_instruction_callback),
 						(r'(<!\[CDATA\[)', pushstate_operator_cdata_section_callback),
 						(r'(<)', pushstate_element_content_starttag_callback),
 						(elementcontentchar, Literal),
