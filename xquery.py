@@ -289,17 +289,18 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'\(:', Comment, 'comment'),
 
 						(r'(\{)', pushstate_root_callback),
-						(r'then|else|external|and|at|div|except', Operator.Word, 'root'),
+						(r'then|else|external|at|div|except', Keyword, 'root'),
+						(r'and|or', Operator.Word, 'root'),
 						(r'(eq|ge|gt|le|lt|ne|idiv|intersect|in)(?=\b)', Operator.Word, 'root'),
-						(r'is|mod|order\s+by|stable\s+order\s+by|or', Keyword, 'root'),
-						(r'return|satisfies|to|union|where|preserve\s+strip', Operator.Word, 'root'),
+						(r'is|mod|order\s+by|stable\s+order\s+by', Keyword, 'root'),
+						(r'return|satisfies|to|union|where|preserve\s+strip', Keyword, 'root'),
 						(r'(::|;|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+|//|/|\||:=|\,|=)', operator_root_callback),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
 						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'itemtype'),
 						(r'(case)|(as)', Keyword, 'itemtype'),
 						(r'(\))(\s*)(as)', bygroups(Punctuation, Text, Keyword), 'itemtype'),
 						(r'\$', Name.Variable, 'varname'),
-						(r'(for|let)(\s+)(\$)', bygroups(Operator.Word, Text, Name.Variable), 'varname'),
+						(r'(for|let)(\s+)(\$)', bygroups(Keyword, Text, Name.Variable), 'varname'),
 						#(r'\)|\?|\]', Punctuation, '#push'),
 						(r'\)|\?|\]', Punctuation),
 						(r'(empty)(\s+)(greatest|least)', bygroups(Keyword, Text, Keyword)),
@@ -359,10 +360,11 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'(item)(\s*)(\()(\s*)(\))(?=[*+?])', bygroups(Keyword, Text, Punctuation, Text, Punctuation), 'occurrenceindicator'),
 						(r'\(\#', Punctuation, 'pragma'),
 						(r';', Punctuation, '#pop'),
-						(r'then|else', Operator.Word, '#pop'),
+						(r'then|else', Keyword, '#pop'),
 						(r'(at)(\s+)' + stringdouble, bygroups(Keyword, Text, String.Double), 'namespacedecl'),
 						(r'(at)(\s+)' + stringsingle, bygroups(Keyword, Text, String.Single), 'namespacedecl'),
-						(r'and|div|except|eq|ge|gt|le|lt|ne|idiv|intersect|in|is|mod|or|return|satisfies|to|union|where', Operator.Word, 'root'),
+						(r'except|intersect|in|is|return|satisfies|to|union|where', Keyword, 'root'),
+						(r'and|div|eq|ge|gt|le|lt|ne|idiv|mod|or', Operator.Word, 'root'),
 						(r':=|=|,|>=|>>|>|\[|\(|<=|<<|<|-|!=|\|', Operator, 'root'),
 						(r'external|at', Keyword, 'root'),
 						(r'(stable)(\s+)(order)(\s+)(by)', bygroups(Keyword, Text, Keyword, Text, Keyword), 'root'),
@@ -535,7 +537,7 @@ class XQueryLexer(ExtendedRegexLexer):
 
 
 						#VARNAMEs
-						(r'(for|let|some|every)(\s+)(\$)', bygroups(Operator.Word, Text, Name.Variable), 'varname'),
+						(r'(for|let|some|every)(\s+)(\$)', bygroups(Keyword, Text, Name.Variable), 'varname'),
 						(r'\$', Name.Variable, 'varname'),
 						(r'(declare)(\s+)(variable)(\s+)(\$)', bygroups(Keyword, Text, Keyword, Text, Name.Variable), 'varname'),
 
@@ -593,13 +595,13 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'(ancestor-or-self|ancestor|attribute|child|descendant-or-self)(::)', bygroups(Keyword, Punctuation)),
 						(r'(descendant|following-sibling|following|parent|preceding-sibling|preceding|self)(::)', bygroups(Keyword, Punctuation)),
 
-						(r'(if)(\s*)(\()', bygroups(Operator.Word, Text, Punctuation)),
+						(r'(if)(\s*)(\()', bygroups(Keyword, Text, Punctuation)),
 
-						(r'then|else', Operator.Word),
+						(r'then|else', Keyword),
 
 						# ML specific
-						(r'(try)(\s*)', bygroups(Operator.Word, Text), 'root'),
-						(r'(catch)(\s*)(\()(\$)', bygroups(Operator.Word, Text, Punctuation, Name.Variable), 'varname'),
+						(r'(try)(\s*)', bygroups(Keyword, Text), 'root'),
+						(r'(catch)(\s*)(\()(\$)', bygroups(Keyword, Text, Punctuation, Name.Variable), 'varname'),
 
 						(r'@' + qname, Name.Attribute),
 						(r'@\*', Name.Attribute),
