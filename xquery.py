@@ -398,21 +398,21 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'\?', Punctuation)
 						],
 				'xml_comment': [
-						(r'-->', Punctuation, '#pop'),
+						(r'-->', String.Doc, '#pop'),
 						(r'[^-]{1,2}', Literal)
 #						(r'\u009|\u00A|\u00D|[\u0020-\u00D7FF]|[\u00E000-\u00FFFD]|[\u0010000-\u0010FFFF]', Literal)
 						],
 				'processing_instruction': [
 						(r'\s+', Text, 'processing_instruction_content'),
-						(r'\?>', Punctuation, '#pop'),
+						(r'\?>', String.Doc, '#pop'),
 						(pitarget, Name)
 						],
 				'processing_instruction_content': [
-						(r'\?>', Punctuation, '#pop'),
+						(r'\?>', String.Doc, '#pop'),
 						(r'\u009|\u00A|\u00D|[\u0020-\uD7FF]|[\uE000-\uFFFD]|[\u10000-\u10FFFF]', Literal)
 						],
 				'cdata_section': [
-						(r']]>', Punctuation, '#pop'),
+						(r']]>', String.Doc, '#pop'),
 						(r'\u009|\u00A|\u00D|[\u0020-\uD7FF]|[\uE000-\uFFFD]|[\u10000-\u10FFFF]', Literal)
 						],
 				'start_tag': [
@@ -548,11 +548,11 @@ class XQueryLexer(ExtendedRegexLexer):
 
 						(r'(processing-instruction)(\s+)(\()', pushstate_operator_kindtestforpi_callback),
 
-						(r'<!--', pushstate_operator_xmlcomment_callback),
+						(r'(<!--)', pushstate_operator_xmlcomment_callback),
 
-						(r'<\?', pushstate_operator_processing_instruction_callback),
+						(r'(<\?)', pushstate_operator_processing_instruction_callback),
 
-						(r'<!\[CDATA\[', pushstate_operator_cdata_section_callback),
+						(r'(<!\[CDATA\[)', pushstate_operator_cdata_section_callback),
 
 				#		(r'</', Name.Tag, 'end_tag'),
 						(r'(<)', pushstate_operator_starttag_callback),
