@@ -241,9 +241,9 @@ class XQueryLexer(ExtendedRegexLexer):
 
 						(r'(\{)', pushstate_root_callback),
 						(r'then|else|external|at|div|except', Keyword, 'root'),
-						(r'and|or', Operator.Word, 'root'),
 						(r'(eq|ge|gt|le|lt|ne|idiv|intersect|in)(?=\b)', Operator.Word, 'root'),
-						(r'is|mod|order\s+by|stable\s+order\s+by', Keyword, 'root'),
+						(r'\b(and|or)\b', Operator.Word, 'root'),
+						(r'\b(is|mod|order\s+by|stable\s+order\s+by)\b', Keyword, 'root'),
 						(r'return|satisfies|to|union|where|preserve\s+strip', Keyword, 'root'),
 						(r'(::|;|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+|//|/|\||:=|,|=)', operator_root_callback),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
