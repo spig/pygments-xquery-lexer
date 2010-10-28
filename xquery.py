@@ -526,7 +526,8 @@ class XQueryLexer(ExtendedRegexLexer):
 
 						#NAMESPACE DECL
 						(r'(declare)(\s+)(default)(\s+)(collation)', bygroups(Keyword, Text, Keyword, Text, Keyword)),
-						(r'(declare)(\s+)(namespace)|(module)(\s+)(namespace)|(declare)(\s+)(base-uri)', bygroups(Keyword, Text, Keyword), 'namespacedecl'),
+						(r'(module|declare)(\s+)(namespace)', bygroups(Keyword, Text, Keyword), 'namespacedecl'),
+						(r'(declare)(\s+)(base-uri)', bygroups(Keyword, Text, Keyword), 'namespacedecl'),
 
 						#NAMESPACE KEYWORD
 						(r'(declare)(\s+)(default)(\s+)(element|function)', bygroups(Keyword, Text, Keyword, Text, Keyword), 'namespacekeyword'),
@@ -570,7 +571,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						#PROCESSING_INSTRUCTION
 						(r'(processing-instruction)(\s+)' + ncname + r'(\s*)(\{)', bygroups(Keyword, Text, Name.Variable, Text, Punctuation), 'operator'),
 
-						(r'(declare)(\s+)(function)', bygroups(Keyword, Text, Keyword)),
+						(r'(declare|define)(\s+)(function)', bygroups(Keyword, Text, Keyword)),
 
 						(r'(\{)', pushstate_operator_root_callback),
 
