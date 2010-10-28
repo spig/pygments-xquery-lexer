@@ -74,50 +74,26 @@ class XQueryLexer(ExtendedRegexLexer):
 
 		def popstate_tag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
-			#print ctx.stack
-			#print lexer.xquery_parse_state
 			ctx.stack.append(lexer.xquery_parse_state.pop())
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.pos = match.end()
 		
 		def popstate_kindtest_callback(lexer, match, ctx):
-			#print ctx.pos
-			#print match.end()
-
-			#print ctx.stack
-			#print lexer.xquery_parse_state
-
 			yield match.start(), Punctuation, match.group(1)
 			next_state = lexer.xquery_parse_state.pop()
 			if next_state == 'occurrenceindicator':
-				#print "match group 2 = " + match.group(2)
 				if re.match("[?*+]+", match.group(2)):
-					#print 'matched the occurrenceindicator'
 					yield match.start(), Punctuation, match.group(2)
 					ctx.stack.append('operator')
 					ctx.pos = match.end()
 				else:
-					#print 'didnt match the occurrenceindicator'
 					ctx.stack.append('operator')
-					#print ctx.pos
-					#print match.end(1)
-					#print match.end()
 					ctx.pos = match.end(1)
 			else:
-				#print 'else matched the next_state' + next_state
 				ctx.stack.append(next_state)
 				ctx.pos = match.end()
 
-			#print ctx.stack
-			#print lexer.xquery_parse_state
-			
-
 		def popstate_callback(lexer, match, ctx):
 			yield match.start(), Punctuation, match.group(1)
-			#print
-			#print ctx.stack
-			#print lexer.xquery_parse_state
 			# if we have run out of our state stack, pop whatever is on the pygments state stack
 			if len(lexer.xquery_parse_state) == 0:
 				ctx.stack.pop()
@@ -126,18 +102,12 @@ class XQueryLexer(ExtendedRegexLexer):
 			else:
 				# i don't know if i'll need this, but in case, default back to root
 				ctx.stack = ['root']
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_element_content_starttag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('element_content')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('start_tag')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_cdata_section_callback(lexer, match, ctx):
@@ -148,11 +118,24 @@ class XQueryLexer(ExtendedRegexLexer):
 
 		def pushstate_starttag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
-			#print ctx.stack
 			lexer.xquery_parse_state.append(ctx.state.pop)
 			ctx.stack.append('start_tag')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
+			ctx.pos = match.end()
+
+		def pushstate_operator_root_validate(lexer, match, ctx):
+			yield match.start(), Keyword, match.group(1)
+			yield match.start(), Text, match.group(2)
+			yield match.start(), Punctuation, match.group(3)
+			ctx.stack = ['root']
+			lexer.xquery_parse_state.append('operator')
+			ctx.pos = match.end()
+
+		def pushstate_operator_root_validate_withmode(lexer, match, ctx):
+			yield match.start(), Keyword, match.group(1)
+			yield match.start(), Text, match.group(2)
+			yield match.start(), Keyword, match.group(3)
+			ctx.stack = ['root']
+			lexer.xquery_parse_state.append('operator')
 			ctx.pos = match.end()
 
 		def pushstate_operator_processing_instruction_callback(lexer, match, ctx):
@@ -177,24 +160,16 @@ class XQueryLexer(ExtendedRegexLexer):
 			yield match.start(), Keyword, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('kindtest')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('kindtest')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_operator_kindtestforpi_callback(lexer, match, ctx):
 			yield match.start(), Keyword, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('kindtestforpi')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 
@@ -202,43 +177,27 @@ class XQueryLexer(ExtendedRegexLexer):
 			yield match.start(), Keyword, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('kindtest')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_occurrenceindicator_kindtest_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
-			#print "added occurrenceindicator"
 			lexer.xquery_parse_state.append('occurrenceindicator')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('kindtest')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_operator_starttag_callback(lexer, match, ctx):
 			yield match.start(), Name.Tag, match.group(1)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.stack.append('start_tag')
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		def pushstate_operator_root_callback(lexer, match, ctx):
 			yield match.start(), Punctuation, match.group(1)
-			#print
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
 			ctx.stack = ['root']#.append('root')
 			ctx.pos = match.end()
 
@@ -246,19 +205,14 @@ class XQueryLexer(ExtendedRegexLexer):
 			yield match.start(), Keyword, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
 			ctx.stack = ['root']
 			ctx.pos = match.end()
 
 		def pushstate_root_callback(lexer, match, ctx):
 			yield match.start(), Punctuation, match.group(1)
 			cur_state = ctx.stack.pop()
-			#print cur_state
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append(cur_state)
-			#print lexer.xquery_parse_state
 			ctx.stack = ['root']#.append('root')
 			ctx.pos = match.end()
 
@@ -266,10 +220,7 @@ class XQueryLexer(ExtendedRegexLexer):
 			yield match.start(), Keyword, match.group(1)
 			yield match.start(), Text, match.group(2)
 			yield match.start(), Punctuation, match.group(3)
-			#print lexer.xquery_parse_state
 			lexer.xquery_parse_state.append('operator')
-			#print lexer.xquery_parse_state
-			#print ctx.stack
 			ctx.pos = match.end()
 
 		tokens = {
@@ -294,7 +245,7 @@ class XQueryLexer(ExtendedRegexLexer):
 						(r'(eq|ge|gt|le|lt|ne|idiv|intersect|in)(?=\b)', Operator.Word, 'root'),
 						(r'is|mod|order\s+by|stable\s+order\s+by', Keyword, 'root'),
 						(r'return|satisfies|to|union|where|preserve\s+strip', Keyword, 'root'),
-						(r'(::|;|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+|//|/|\||:=|\,|=)', operator_root_callback),
+						(r'(::|;|>=|>>|>|\[|<=|<<|<|-|\*|!=|\+|//|/|\||:=|,|=)', operator_root_callback),
 						(r'(castable|cast)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'singletype'),
 						(r'(instance)(\s+)(of)|(treat)(\s+)(as)', bygroups(Keyword, Text, Keyword), 'itemtype'),
 						(r'(case)|(as)', Keyword, 'itemtype'),
@@ -560,8 +511,8 @@ class XQueryLexer(ExtendedRegexLexer):
 
 						(r'(declare)(\s+)(boundary-space)', bygroups(Keyword, Text, Keyword), 'xmlspace_decl'),
 
-						(r'(validate)(\s*)(\{)', bygroups(Keyword, Text, Punctuation), ('operator', 'root')),
-						(r'(validate)(\s+)(lex|strict)', bygroups(Keyword, Text, Keyword), ('operator', 'root')),
+						(r'(validate)(\s+)(lax|strict)', pushstate_operator_root_validate_withmode),
+						(r'(validate)(\s*)(\{)', pushstate_operator_root_validate),
 						(r'(typeswitch)(\s*)(\()', bygroups(Keyword, Text, Punctuation)),
 						(r'(element|attribute)(\s*)(\{)', pushstate_operator_root_construct_callback),
 
